@@ -103,7 +103,7 @@
 
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-amber-200 mb-1">Sua Idade *</label>
-                    <input type="number" id="user-age" required min="1" max="120" placeholder="Ex: 25" 
+                    <input type="number" id="user-age" required min="1" max="120" placeholder="Ex: 8" 
                         class="w-full px-4 py-3 bg-slate-800/90 border border-amber-500/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 text-white placeholder-gray-500 font-medium">
                 </div>
 
@@ -154,7 +154,7 @@
                         <div id="play-dot" class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
                         <span id="player-status-label" class="text-xs font-semibold text-amber-200 uppercase tracking-wider">Papai Noel Falando</span>
                     </div>
-                    <span class="text-xs text-gray-300 font-mono">00:15 / 00:30</span>
+                    <span class="text-xs text-gray-300 font-mono">00:20 / 00:35</span>
                 </div>
 
                 <!-- Santa Avatar / Illustration Area -->
@@ -166,7 +166,7 @@
                     </div>
                     <div class="mt-3 text-center">
                         <span class="text-xs font-bold bg-amber-400 text-slate-950 px-3 py-0.5 rounded-full uppercase tracking-wider shadow">
-                            Fábrica do Polo Norte &bull; Ao Vivo
+                            Fábrica do Polo Norte &bull; Ao Vivo 🔴
                         </span>
                     </div>
                 </div>
@@ -225,6 +225,7 @@
         let userAge = "";
         let speechSynth = window.speechSynthesis;
         let currentUtterance = null;
+        let audioCtx = null;
 
         // Generate Falling Snowflakes
         function initSnow() {
@@ -286,21 +287,73 @@
             }, 1000);
         }
 
-        // Script generation
+        // Script generation with rich pauses and magical tone
         function getInvitationScript() {
-            return `Ho, ho, ho! Olá ${userName}! Sou eu, o Papai Noel, falando diretamente da minha fábrica no Polo Norte! Fiquei sabendo que você tem ${userAge} anos de pura alegria e bom comportamento. Por isso, faço questão de te convidar pessoalmente para a grande Festa de Natal do Acadêmicos da Vila! Venha celebrar com a gente! Um Feliz Natal e um Ano Novo maravilhoso! Ho, ho, ho!`;
+            return `Ho, ho, ho! Olá, ${userName}! Sou eu, o Papai Noel, falando diretamente da minha oficina mágica no Polo Norte! Fiquei sabendo que você tem ${userAge} anos... e que se comportou muito bem este ano! Por isso, faço questão de te convidar pessoalmente para a grande Festa de Natal do Acadêmicos da Vila! Venha celebrar com a gente, vai ser inesquecível! Um Feliz Natal e um Ano Novo maravilhoso! Ho, ho, ho!`;
         }
 
-        // Helper to find the best male Portuguese voice
+        // Advanced Voice Selection targeting High Quality Neural/Online/Natural Voices
         function getBestSantaVoice() {
             const voices = speechSynth.getVoices();
-            // Try to find a Portuguese voice with male descriptors or names
-            let ptVoice = voices.find(v => v.lang.includes('pt') && (v.name.toLowerCase().includes('antonio') || v.name.toLowerCase().includes('ricardo') || v.name.toLowerCase().includes('felipe') || v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('male')));
-            if (!ptVoice) {
-                // Fallback to any Portuguese voice
-                ptVoice = voices.find(v => v.lang.includes('pt-BR') || v.lang.includes('pt'));
+            
+            // 1. Try to find Microsoft or Google Neural/Natural Portuguese voice first (best quality)
+            let voice = voices.find(v => v.lang.includes('pt') && (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('online') || v.name.toLowerCase().includes('neural')));
+            
+            // 2. If not found, try specific male Portuguese voices
+            if (!voice) {
+                voice = voices.find(v => v.lang.includes('pt') && (v.name.toLowerCase().includes('antonio') || v.name.toLowerCase().includes('ricardo') || v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('felipe') || v.name.toLowerCase().includes('male')));
             }
-            return ptVoice || null;
+            
+            // 3. Fallback to any Portuguese voice
+            if (!voice) {
+                voice = voices.find(v => v.lang.includes('pt-BR') || v.lang.includes('pt'));
+            }
+            
+            return voice || null;
+        }
+
+        // Play subtle magical Christmas ambiance (fire crackle & chimes)
+        function playMagicalAmbiance() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                // Create a gentle fireplace/wind warm noise
+                const bufferSize = audioCtx.sampleRate * 2;
+                const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 2 - 1;
+                }
+
+                const whiteNoise = audioCtx.createBufferSource();
+                whiteNoise.buffer = noiseBuffer;
+                whiteNoise.loop = true;
+
+                // Low pass filter to make it cozy and warm like a distant fireplace
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(350, audioCtx.currentTime);
+
+                const gainNode = audioCtx.createGain();
+                gainNode.gain.setValueAtTime(0.015, audioCtx.currentTime); // Very soft background ambiance
+
+                whiteNoise.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                whiteNoise.start();
+
+                // Stop ambiance after 20 seconds
+                setTimeout(() => {
+                    try { whiteNoise.stop(); } catch(e) {}
+                }, 22000);
+            } catch (e) {
+                console.log("Audio Context info:", e);
+            }
         }
 
         function playSantaVoice() {
@@ -310,18 +363,20 @@
             }
 
             speechSynth.cancel();
+            playMagicalAmbiance();
 
             const textToSpeak = getInvitationScript();
             currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
             currentUtterance.lang = 'pt-BR';
             
-            // Voice adjustment for a deep, realistic Santa voice
             const santaVoice = getBestSantaVoice();
             if (santaVoice) {
                 currentUtterance.voice = santaVoice;
             }
-            currentUtterance.rate = 0.85;  // Slow, jolly and resonant pace
-            currentUtterance.pitch = 0.4;  // Deep, booming masculine Santa voice
+            
+            // Optimized parameters for a warm, cozy storytelling cadence
+            currentUtterance.rate = 0.9;  // Calm, storytelling pace
+            currentUtterance.pitch = 0.55; // Warm, deep masculine tone without sounding cartoonish
 
             const avatarContainer = document.getElementById('santa-avatar-container');
             const subtitleEl = document.getElementById('karaoke-subtitle');
@@ -329,10 +384,10 @@
             const playDot = document.getElementById('play-dot');
 
             const chunks = [
-                `🎅 Ho, ho, ho! Olá ${userName}!`,
-                `🎁 Aqui é o Papai Noel, direto da minha fábrica no Polo Norte!`,
-                `⭐ Fiquei sabendo que você tem ${userAge} anos. Venha para a Festa de Natal do Acadêmicos da Vila!`,
-                `✨ Não vejo a hora de te ver lá com a gente!`,
+                `🎅 Ho, ho, ho! Olá, ${userName}!`,
+                `🎁 Sou eu, o Papai Noel, na minha oficina mágica no Polo Norte!`,
+                `⭐ Fiquei sabendo que você tem ${userAge} anos e se comportou muito bem!`,
+                `✨ Venha para a grande Festa de Natal do Acadêmicos da Vila!`,
                 `🎄 Um Feliz Natal e um Ano Novo maravilhoso! Ho, ho, ho!`
             ];
 
@@ -355,7 +410,7 @@
                     } else {
                         clearInterval(chunkInterval);
                     }
-                }, 3200);
+                }, 3500);
             };
 
             currentUtterance.onend = function() {
@@ -375,7 +430,6 @@
             speechSynth.speak(currentUtterance);
         }
 
-        // Trigger voice loading list initialization in some browsers
         if (speechSynth.onvoiceschanged !== undefined) {
             speechSynth.onvoiceschanged = getBestSantaVoice;
         }
