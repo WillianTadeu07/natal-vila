@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convite Mágico do Papai Noel - Acadêmicos da Vila</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at center, #1b4332 0%, #081c15 100%);
+            overflow-x: hidden;
+        }
+        .christmas-title {
+            font-family: 'Mountains of Christmas', cursive;
+        }
+        /* Falling snow effect */
+        .snowflake {
+            position: fixed;
+            top: -10px;
+            background: #ffffff;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: fall linear infinite;
+            opacity: 0.8;
+            z-index: 50;
+        }
+        @keyframes fall {
+            0% {
+                transform: translateY(-10px) translateX(0);
+            }
+            100% {
+                transform: translateY(105vh) translateX(20px);
+            }
+        }
+        /* Blinking fairy lights */
+        @keyframes blink {
+            0%, 100% { opacity: 0.3; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+        .light-red { animation: blink 1.5s infinite; background-color: #ef4444; box-shadow: 0 0 10px #ef4444; }
+        .light-yellow { animation: blink 1.2s infinite 0.3s; background-color: #eab308; box-shadow: 0 0 10px #eab308; }
+        .light-green { animation: blink 1.8s infinite 0.6s; background-color: #22c55e; box-shadow: 0 0 10px #22c55e; }
+        .light-blue { animation: blink 1.4s infinite 0.9s; background-color: #3b82f6; box-shadow: 0 0 10px #3b82f6; }
+
+        /* Santa speaking animation */
+        @keyframes talk {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.03) rotate(-1deg); }
+            75% { transform: scale(1.03) rotate(1deg); }
+        }
+        .santa-talking {
+            animation: talk 0.6s ease-in-out infinite;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #081c15; }
+        ::-webkit-scrollbar-thumb { background: #b91c1c; border-radius: 4px; }
+    </style>
+</head>
+<body class="min-h-full flex flex-col items-center justify-center p-4 relative text-white">
+
+    <!-- Falling Snow Container -->
+    <div id="snow-container" class="absolute inset-0 pointer-events-none overflow-hidden z-0"></div>
+
+    <!-- Fairy Lights Header Border -->
+    <div class="w-full max-w-lg flex justify-around mb-2 px-4 z-10">
+        <div class="w-3 h-3 rounded-full light-red"></div>
+        <div class="w-3 h-3 rounded-full light-yellow"></div>
+        <div class="w-3 h-3 rounded-full light-green"></div>
+        <div class="w-3 h-3 rounded-full light-blue"></div>
+        <div class="w-3 h-3 rounded-full light-red"></div>
+        <div class="w-3 h-3 rounded-full light-yellow"></div>
+        <div class="w-3 h-3 rounded-full light-green"></div>
+        <div class="w-3 h-3 rounded-full light-blue"></div>
+        <div class="w-3 h-3 rounded-full light-red"></div>
+        <div class="w-3 h-3 rounded-full light-yellow"></div>
+    </div>
+
+    <!-- Main Card Container -->
+    <main class="w-full max-w-md bg-gradient-to-b from-red-950 via-slate-900 to-slate-950 border-4 border-amber-400 rounded-3xl shadow-2xl p-6 sm:p-8 relative z-10 backdrop-blur-md">
+
+        <!-- SCREEN 1: FORMULÁRIO -->
+        <div id="screen-form" class="space-y-6">
+            <div class="text-center space-y-2">
+                <span class="text-xs uppercase tracking-widest bg-amber-500/20 text-amber-300 font-semibold px-3 py-1 rounded-full border border-amber-500/30">
+                    Acadêmicos da Vila
+                </span>
+                <h1 class="christmas-title text-4xl sm:text-5xl text-amber-300 drop-shadow-md">
+                    Convite Mágico do Papai Noel
+                </h1>
+                <p class="text-gray-300 text-sm">
+                    Preencha seus dados para receber um convite em vídeo personalizado direto do Polo Norte! 🎅✨
+                </p>
+            </div>
+
+            <form id="invite-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-amber-200 mb-1">Seu Nome *</label>
+                    <input type="text" id="user-name" required placeholder="Ex: Maria Silva" 
+                        class="w-full px-4 py-3 bg-slate-800/90 border border-amber-500/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 text-white placeholder-gray-500 font-medium">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-amber-200 mb-1">Apelido ou Como Gosta de ser Chamado (Opcional)</label>
+                    <input type="text" id="user-nickname" placeholder="Ex: Mari" 
+                        class="w-full px-4 py-3 bg-slate-800/90 border border-amber-500/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 text-white placeholder-gray-500 font-medium">
+                </div>
+
+                <button type="submit" 
+                    class="w-full py-4 bg-gradient-to-r from-red-600 via-red-500 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-bold rounded-xl shadow-lg shadow-red-900/50 transform active:scale-95 transition-all duration-200 flex items-center justify-center space-x-2 text-lg border border-amber-300/40">
+                    <span>✨ Gerar Meu Convite Mágico</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- SCREEN 2: LOADING MÁGICO -->
+        <div id="screen-loading" class="hidden py-12 text-center space-y-6">
+            <div class="relative w-28 h-28 mx-auto flex items-center justify-center">
+                <!-- Glowing rotating ring -->
+                <div class="absolute inset-0 border-4 border-amber-400/30 border-t-amber-400 rounded-full animate-spin"></div>
+                <span class="text-5xl animate-bounce">🎁</span>
+            </div>
+            <div class="space-y-2">
+                <h2 class="christmas-title text-3xl text-amber-300">Preparando a Magia...</h2>
+                <p id="loading-status-text" class="text-sm text-amber-100 font-medium transition-opacity duration-300">
+                    Verificando a lista de comportamentos...
+                </p>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden border border-amber-500/30">
+                <div id="loading-bar" class="bg-gradient-to-r from-amber-400 to-red-500 h-2.5 rounded-full w-0 transition-all duration-500"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: VÍDEO / EXPERIÊNCIA INTERATIVA -->
+        <div id="screen-player" class="hidden space-y-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-xs uppercase tracking-widest text-amber-400 font-bold">Convite Oficial</span>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <span>🎄</span> Festa do Acadêmicos da Vila
+                    </h2>
+                </div>
+                <button onclick="resetApp()" class="text-xs bg-slate-800 hover:bg-slate-700 text-amber-300 px-3 py-1.5 rounded-lg border border-amber-500/30 transition-colors">
+                    🔄 Outro Nome
+                </button>
+            </div>
+
+            <!-- Fake Video Player Container -->
+            <div class="relative w-full aspect-[4/3] bg-gradient-to-b from-red-900/90 to-slate-950 rounded-2xl border-4 border-amber-400 shadow-2xl overflow-hidden flex flex-col items-center justify-between p-4">
+                
+                <!-- Video Header Controls UI Simulation -->
+                <div class="w-full flex justify-between items-center z-10 bg-black/30 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/10">
+                    <div class="flex items-center space-x-2">
+                        <div id="play-dot" class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
+                        <span id="player-status-label" class="text-xs font-semibold text-amber-200 uppercase tracking-wider">Papai Noel Falando</span>
+                    </div>
+                    <span class="text-xs text-gray-300 font-mono">00:15 / 00:30</span>
+                </div>
+
+                <!-- Santa Avatar / Illustration Area -->
+                <div class="my-auto relative flex flex-col items-center justify-center">
+                    <div id="santa-avatar-container" class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-gradient-to-b from-red-600 to-red-800 border-4 border-amber-400 shadow-xl flex items-center justify-center relative transition-transform">
+                        <!-- Santa Face SVG / Emoji -->
+                        <div class="text-7xl select-none filter drop-shadow-md">🎅</div>
+                        <!-- Sparkles -->
+                        <div class="absolute -top-1 -right-1 text-amber-300 animate-ping">✨</div>
+                        <div class="absolute -bottom-1 -left-1 text-amber-300 animate-pulse">⭐</div>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <span class="text-xs font-bold bg-amber-400 text-slate-950 px-3 py-0.5 rounded-full uppercase tracking-wider shadow">
+                            Ao Vivo do Polo Norte
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Karaoke Subtitle Box -->
+                <div class="w-full bg-black/60 backdrop-blur-md border border-amber-500/40 rounded-xl p-3 text-center min-h-[76px] flex items-center justify-center">
+                    <p id="karaoke-subtitle" class="text-sm sm:text-base font-semibold text-amber-100 leading-snug">
+                        Pressione "Ouvir Novamente" para escutar o Papai Noel chamar seu nome!
+                    </p>
+                </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="playSantaVoice()" 
+                    class="py-3 bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold rounded-xl border border-amber-500/40 flex items-center justify-center space-x-2 transition-all shadow">
+                    <span>🔊</span>
+                    <span>Ouvir de Novo</span>
+                </button>
+                <button onclick="confirmAttendance()" 
+                    class="py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold rounded-xl border border-green-300/40 flex items-center justify-center space-x-2 transition-all shadow-lg shadow-green-900/40">
+                    <span>🎉</span>
+                    <span>Confirmar Presença</span>
+                </button>
+            </div>
+
+            <button onclick="shareInvite()" 
+                class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl border border-blue-300/40 flex items-center justify-center space-x-2 transition-all shadow">
+                <span>📤</span>
+                <span>Compartilhar Convite no WhatsApp</span>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Custom Modal for Alerts/Confirmations (No window.alert) -->
+    <div id="custom-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-gradient-to-b from-red-950 to-slate-900 border-2 border-amber-400 rounded-2xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl relative">
+            <div id="modal-icon" class="text-5xl">🎄</div>
+            <h3 id="modal-title" class="christmas-title text-2xl text-amber-300">Mensagem do Papai Noel</h3>
+            <p id="modal-message" class="text-sm text-gray-200 leading-relaxed">Mensagem aqui...</p>
+            <button onclick="closeModal()" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition-all shadow">
+                Entendido, Ho Ho Ho! 🎅
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer Credit -->
+    <footer class="mt-4 text-center text-xs text-gray-400 z-10">
+        Acadêmicos da Vila &bull; Magia de Natal 2026 🌟
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Global State Variables
+        let userName = "";
+        let userNickname = "";
+        let speechSynth = window.speechSynthesis;
+        let currentUtterance = null;
+
+        // Generate Falling Snowflakes
+        function initSnow() {
+            const container = document.getElementById('snow-container');
+            const snowflakeCount = 35;
+            for (let i = 0; i < snowflakeCount; i++) {
+                const flake = document.createElement('div');
+                flake.classList.add('snowflake');
+                const size = Math.random() * 5 + 3 + 'px';
+                flake.style.width = size;
+                flake.style.height = size;
+                flake.style.left = Math.random() * 100 + 'vw';
+                flake.style.animationDuration = Math.random() * 5 + 3 + 's';
+                flake.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(flake);
+            }
+        }
+        initSnow();
+
+        // Handle Form Submission
+        document.getElementById('invite-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            userName = document.getElementById('user-name').value.trim();
+            userNickname = document.getElementById('user-nickname').value.trim() || userName;
+
+            if (!userName) return;
+
+            // Switch to Loading Screen
+            document.getElementById('screen-form').classList.add('hidden');
+            document.getElementById('screen-loading').classList.remove('hidden');
+
+            runLoadingSequence();
+        });
+
+        // Loading Steps Sequence
+        function runLoadingSequence() {
+            const statusText = document.getElementById('loading-status-text');
+            const progressBar = document.getElementById('loading-bar');
+            
+            const steps = [
+                { text: "Verificando a lista de comportamentos...", progress: "30%" },
+                { text: "Consultando os elfos da oficina...", progress: "65%" },
+                { text: "Preparando o trenó e o convite especial...", progress: "100%" }
+            ];
+
+            let index = 0;
+            const interval = setInterval(() => {
+                if (index < steps.length) {
+                    statusText.textContent = steps[index].text;
+                    progressBar.style.width = steps[index].progress;
+                    index++;
+                } else {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('screen-loading').classList.add('hidden');
+                        document.getElementById('screen-player').classList.remove('hidden');
+                        playSantaVoice();
+                    }, 800);
+                }
+            }, 1000);
+        }
+
+        // Speech and Karaoke Simulation
+        function getInvitationScript() {
+            const callName = userNickname || userName;
+            return `Ho, ho, ho! Olá ${callName}! Aqui é o Papai Noel! Estou passando para te fazer um convite imperdível: venha curtir a grande Festa de Natal do Acadêmicos da Vila! Não vejo a hora de te ver lá com a gente! Um Feliz Natal e um Ano Novo maravilhoso! Ho, ho, ho!`;
+        }
+
+        function playSantaVoice() {
+            if (!speechSynth) {
+                showModal("Aviso", "Seu navegador não suporta a Síntese de Voz, mas o convite está garantido!");
+                return;
+            }
+
+            // Cancel any ongoing speech
+            speechSynth.cancel();
+
+            const textToSpeak = getInvitationScript();
+            currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
+            currentUtterance.lang = 'pt-BR';
+            currentUtterance.rate = 0.95; // Jolly pace
+            currentUtterance.pitch = 0.9;  // Deep Santa voice
+
+            const avatarContainer = document.getElementById('santa-avatar-container');
+            const subtitleEl = document.getElementById('karaoke-subtitle');
+            const statusLabel = document.getElementById('player-status-label');
+            const playDot = document.getElementById('play-dot');
+
+            // Split into sentence chunks for karaoke display
+            const callName = userNickname || userName;
+            const chunks = [
+                "🎅 Ho, ho, ho! Olá " + callName + "!",
+                "🎁 Aqui é o Papai Noel!",
+                "⭐ Venha curtir a grande Festa de Natal do Acadêmicos da Vila!",
+                "✨ Não vejo a hora de te ver lá com a gente!",
+                "🎄 Um Feliz Natal e um Ano Novo maravilhoso! Ho, ho, ho!"
+            ];
+
+            let chunkIndex = 0;
+            let chunkInterval = null;
+
+            currentUtterance.onstart = function() {
+                avatarContainer.classList.add('santa-talking');
+                playDot.classList.remove('bg-red-500');
+                playDot.classList.add('bg-green-500');
+                statusLabel.textContent = "Papai Noel está falando...";
+
+                subtitleEl.textContent = chunks[0];
+                chunkIndex = 1;
+
+                chunkInterval = setInterval(() => {
+                    if (chunkIndex < chunks.length) {
+                        subtitleEl.textContent = chunks[chunkIndex];
+                        chunkIndex++;
+                    } else {
+                        clearInterval(chunkInterval);
+                    }
+                }, 2800);
+            };
+
+            currentUtterance.onend = function() {
+                avatarContainer.classList.remove('santa-talking');
+                playDot.classList.remove('bg-green-500');
+                playDot.classList.add('bg-red-500');
+                statusLabel.textContent = "Mensagem Concluída";
+                subtitleEl.textContent = "✨ Toque em 'Ouvir de Novo' para assistir novamente!";
+                if (chunkInterval) clearInterval(chunkInterval);
+            };
+
+            currentUtterance.onerror = function() {
+                avatarContainer.classList.remove('santa-talking');
+                if (chunkInterval) clearInterval(chunkInterval);
+            };
+
+            speechSynth.speak(currentUtterance);
+        }
+
+        // Confirm Attendance
+        function confirmAttendance() {
+            const callName = userNickname || userName;
+            showModal(
+                "Presença Confirmada! 🎉",
+                `Oba, ${callName}! Sua presença na Festa de Natal do Acadêmicos da Vila foi confirmada com sucesso! O Papai Noel já separou um lugar especial para você no trenó!`
+            );
+        }
+
+        // Share Invite
+        function shareInvite() {
+            const shareText = `🎄 Convite Mágico do Papai Noel para a Festa do Acadêmicos da Vila! Venha você também celebrar o Natal! 🎅✨`;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    showModal("Link Copiado! 📋", "O link do convite mágico foi copiado para a sua área de transferência. Cole no WhatsApp e envie para os amigos!");
+                }).catch(() => {
+                    fallbackCopy(shareText);
+                });
+            } else {
+                fallbackCopy(shareText);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showModal("Link Copiado! 📋", "Convite pronto para ser compartilhado no WhatsApp!");
+            } catch (err) {
+                showModal("Compartilhamento", text);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // Reset App to Form Screen
+        function resetApp() {
+            if (speechSynth) speechSynth.cancel();
+            document.getElementById('screen-player').classList.add('hidden');
+            document.getElementById('screen-form').classList.remove('hidden');
+            document.getElementById('user-name').value = "";
+            document.getElementById('user-nickname').value = "";
+        }
+
+        // Modal Helpers (No alert/confirm)
+        function showModal(title, message) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('custom-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
