@@ -42,7 +42,7 @@
         .light-green { animation: blink 1.8s infinite 0.6s; background-color: #22c55e; box-shadow: 0 0 12px #22c55e; }
         .light-blue { animation: blink 1.4s infinite 0.9s; background-color: #3b82f6; box-shadow: 0 0 12px #3b82f6; }
 
-        /* Santa speaking animation (gentle camera breathing zoom) */
+        /* Santa speaking animation */
         @keyframes talk {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.02); }
@@ -144,7 +144,7 @@
                 </button>
             </div>
 
-            <!-- Realistic Video Player Container -->
+            <!-- Realistic Video Player Container (Sem Legendas) -->
             <div class="relative w-full aspect-[4/3] bg-black rounded-2xl border-4 border-amber-400 shadow-2xl overflow-hidden flex flex-col items-center justify-between">
                 
                 <!-- Video Header Controls UI Simulation -->
@@ -158,12 +158,7 @@
 
                 <!-- REAL HUMAN SANTA PHOTOGRAPH CONTAINER -->
                 <div id="santa-avatar-container" class="absolute inset-0 w-full h-full overflow-hidden transition-transform duration-700">
-                    <!-- Fotografia real, humana e acolhedora de um Papai Noel autêntico -->
-                   <img src="noel.jpg" alt="Papai Noel Real" class="w-full h-full object-cover object-center filter brightness-95 contrast-105"> 
-                         alt="Papai Noel Real" 
-                         class="w-full h-full object-cover object-center filter brightness-95 contrast-105">
-                    <!-- Gradiente escuro na base para legibilidade da legenda -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-black/20 pointer-events-none"></div>
+                    <img src="noel.jpg" alt="Papai Noel Real" class="w-full h-full object-cover object-center filter brightness-95 contrast-105">
                 </div>
 
                 <!-- Efeito sutil de neve flutuando -->
@@ -171,15 +166,6 @@
                     <div class="w-1.5 h-1.5 bg-white rounded-full animate-ping mt-6"></div>
                     <div class="w-2 h-2 bg-white rounded-full animate-pulse mt-16"></div>
                     <div class="w-1 h-1 bg-white rounded-full animate-ping mt-10"></div>
-                </div>
-
-                <!-- Subtitle / Karaoke Box -->
-                <div class="w-full z-30 mt-auto p-3">
-                    <div class="w-full bg-black/85 backdrop-blur-md border border-amber-400/70 rounded-xl p-3 text-center min-h-[76px] flex items-center justify-center shadow-2xl">
-                        <p id="karaoke-subtitle" class="text-sm sm:text-base font-semibold text-amber-100 leading-snug drop-shadow-md">
-                            Pressione "Ouvir Novamente" para escutar o Papai Noel chamar seu nome!
-                        </p>
-                    </div>
                 </div>
             </div>
 
@@ -227,9 +213,7 @@
     <script>
         let userName = "";
         let userAge = "";
-        let speechSynth = window.speechSynthesis;
-        let currentUtterance = null;
-        let audioCtx = null;
+        let santaAudio = new Audio('papai-noel.mp3'); // Arquivo de áudio real do Papai Noel
 
         // Generate Falling Snowflakes
         function initSnow() {
@@ -291,139 +275,31 @@
             }, 1000);
         }
 
-        // Magical storytelling script with warm pauses
-        function getInvitationScript() {
-            return `Ho... ho... ho! Olá, ${userName}! Sou eu... o Papai Noel! Estou falando diretamente da minha poltrona mágica no Polo Norte. Fiquei sabendo que você tem ${userAge} anos... e que tem sido uma criança maravilhosa este ano! Por isso... faço questão absoluta de te convidar pessoalmente para a grande Festa de Natal do Acadêmicos da Vila! Venha celebrar com a gente, o seu lugar já está guardado no meu coração e no trenó! Um Feliz Natal... e um Ano Novo mágico! Ho, ho, ho!`;
-        }
-
-        function getBestSantaVoice() {
-            const voices = speechSynth.getVoices();
-            let voice = voices.find(v => v.lang.includes('pt') && (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('online') || v.name.toLowerCase().includes('neural')));
-            if (!voice) {
-                voice = voices.find(v => v.lang.includes('pt') && (v.name.toLowerCase().includes('antonio') || v.name.toLowerCase().includes('ricardo') || v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('felipe') || v.name.toLowerCase().includes('male')));
-            }
-            if (!voice) {
-                voice = voices.find(v => v.lang.includes('pt-BR') || v.lang.includes('pt'));
-            }
-            return voice || null;
-        }
-
-        // Cozy fireplace ambiance
-        function playMagicalAmbiance() {
-            try {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-
-                const bufferSize = audioCtx.sampleRate * 2;
-                const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                const output = noiseBuffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    output[i] = Math.random() * 2 - 1;
-                }
-
-                const whiteNoise = audioCtx.createBufferSource();
-                whiteNoise.buffer = noiseBuffer;
-                whiteNoise.loop = true;
-
-                const filter = audioCtx.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(250, audioCtx.currentTime);
-
-                const gainNode = audioCtx.createGain();
-                gainNode.gain.setValueAtTime(0.008, audioCtx.currentTime);
-
-                whiteNoise.connect(filter);
-                filter.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                whiteNoise.start();
-
-                setTimeout(() => {
-                    try { whiteNoise.stop(); } catch(e) {}
-                }, 30000);
-            } catch (e) {
-                console.log(e);
-            }
-        }
-
         function playSantaVoice() {
-            if (!speechSynth) {
-                showModal("Aviso", "Seu navegador não suporta a Síntese de Voz, mas o convite está garantido!");
-                return;
-            }
-
-            speechSynth.cancel();
-            playMagicalAmbiance();
-
-            const textToSpeak = getInvitationScript();
-            currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
-            currentUtterance.lang = 'pt-BR';
-            
-            const santaVoice = getBestSantaVoice();
-            if (santaVoice) {
-                currentUtterance.voice = santaVoice;
-            }
-            
-            currentUtterance.rate = 0.82; 
-            currentUtterance.pitch = 0.45; 
-
             const avatarContainer = document.getElementById('santa-avatar-container');
-            const subtitleEl = document.getElementById('karaoke-subtitle');
             const statusLabel = document.getElementById('player-status-label');
             const playDot = document.getElementById('play-dot');
 
-            const chunks = [
-                `🎅 Ho... ho... ho! Olá, ${userName}!`,
-                `🎁 Sou eu... o Papai Noel, falando direto do Polo Norte!`,
-                `⭐ Fiquei sabendo que você tem ${userAge} anos e tem sido muito especial!`,
-                `✨ Venha participar da grande Festa de Natal do Acadêmicos da Vila!`,
-                `🎄 Um Feliz Natal e um Ano Novo mágico! Ho, ho, ho!`
-            ];
+            // Para qualquer reprodução anterior
+            santaAudio.pause();
+            santaAudio.currentTime = 0;
 
-            let chunkIndex = 0;
-            let chunkInterval = null;
-
-            currentUtterance.onstart = function() {
+            santaAudio.play().then(() => {
                 avatarContainer.classList.add('santa-talking');
                 playDot.classList.remove('bg-red-500');
                 playDot.classList.add('bg-green-500');
                 statusLabel.textContent = "AO VIVO • CHAMADA SEGURA 🔴";
+            }).catch(error => {
+                console.log("Erro ao reproduzir áudio:", error);
+                showModal("Aviso", "Toque em 'Ouvir de Novo' para iniciar a mensagem do Papai Noel!");
+            });
 
-                subtitleEl.textContent = chunks[0];
-                chunkIndex = 1;
-
-                chunkInterval = setInterval(() => {
-                    if (chunkIndex < chunks.length) {
-                        subtitleEl.textContent = chunks[chunkIndex];
-                        chunkIndex++;
-                    } else {
-                        clearInterval(chunkInterval);
-                    }
-                }, 4500);
-            };
-
-            currentUtterance.onend = function() {
+            santaAudio.onended = function() {
                 avatarContainer.classList.remove('santa-talking');
                 playDot.classList.remove('bg-green-500');
                 playDot.classList.add('bg-red-500');
                 statusLabel.textContent = "MENSAGEM CONCLUÍDA 🌟";
-                subtitleEl.textContent = "✨ Toque em 'Ouvir de Novo' para ver o Papai Noel novamente!";
-                if (chunkInterval) clearInterval(chunkInterval);
             };
-
-            currentUtterance.onerror = function() {
-                avatarContainer.classList.remove('santa-talking');
-                if (chunkInterval) clearInterval(chunkInterval);
-            };
-
-            speechSynth.speak(currentUtterance);
-        }
-
-        if (speechSynth.onvoiceschanged !== undefined) {
-            speechSynth.onvoiceschanged = getBestSantaVoice;
         }
 
         // Confirm Attendance
@@ -465,7 +341,8 @@
 
         // Reset App to Form Screen
         function resetApp() {
-            if (speechSynth) speechSynth.cancel();
+            santaAudio.pause();
+            santaAudio.currentTime = 0;
             document.getElementById('screen-player').classList.add('hidden');
             document.getElementById('screen-form').classList.remove('hidden');
             document.getElementById('user-name').value = "";
