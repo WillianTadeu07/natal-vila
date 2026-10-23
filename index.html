@@ -89,26 +89,26 @@
                     Convite Mágico do Papai Noel
                 </h1>
                 <p class="text-gray-300 text-sm">
-                    Digite o nome e a idade para receber um convite em vídeo exclusivo direto do Polo Norte! 🎅✨
+                    Digite seu nome e idade para ver o vídeo especial que o Papai Noel gravou para você! 🎅✨
                 </p>
             </div>
 
             <form id="invite-form" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-amber-200 mb-1">Nome da Criança *</label>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-amber-200 mb-1">Seu Nome *</label>
                     <input type="text" id="user-name" required placeholder="Ex: Joãozinho" 
                         class="w-full px-4 py-3 bg-slate-800/90 border border-amber-500/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 text-white placeholder-gray-500 font-medium">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-amber-200 mb-1">Idade *</label>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-amber-200 mb-1">Sua Idade *</label>
                     <input type="number" id="user-age" required min="1" max="120" placeholder="Ex: 7" 
                         class="w-full px-4 py-3 bg-slate-800/90 border border-amber-500/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 text-white placeholder-gray-500 font-medium">
                 </div>
 
                 <button type="submit" 
                     class="w-full py-4 bg-gradient-to-r from-red-600 via-red-500 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-bold rounded-xl shadow-lg shadow-red-900/50 transform active:scale-95 transition-all duration-200 flex items-center justify-center space-x-2 text-lg border border-amber-300/40">
-                    <span>✨ Revelar Vídeo do Papai Noel</span>
+                    <span>✨ Ver Mensagem do Papai Noel</span>
                 </button>
             </form>
         </div>
@@ -120,9 +120,9 @@
                 <span class="text-5xl animate-bounce">🎁</span>
             </div>
             <div class="space-y-2">
-                <h2 class="christmas-title text-3xl text-amber-300">Conectando ao Polo Norte...</h2>
+                <h2 class="christmas-title text-3xl text-amber-300">Chamando o Polo Norte...</h2>
                 <p id="loading-status-text" class="text-sm text-amber-100 font-medium transition-opacity duration-300">
-                    Abrindo o livro de ouro do Papai Noel...
+                    Procurando seu nome no livro do Papai Noel...
                 </p>
             </div>
             <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden border border-amber-500/30">
@@ -256,8 +256,8 @@
             
             const steps = [
                 { text: "Abrindo o grande livro de ouro...", progress: "35%" },
-                { text: "Consultando os duendes na oficina mágica...", progress: "70%" },
-                { text: "Ligando a câmera de vídeo do Polo Norte...", progress: "100%" }
+                { text: "Chamando os duendes na oficina...", progress: "70%" },
+                { text: "Ligando a câmera mágica...", progress: "100%" }
             ];
 
             let index = 0;
@@ -277,16 +277,15 @@
             }, 1000);
         }
 
-        // Script com pausas orgânicas e entonação calorosa de avô
+        // Frase bem simples, emocionante e mágica, perfeita para crianças entenderem e se encantarem
         function getInvitationScript() {
-            return `Ho... ho... ho! Olá, ${userName}! Que alegria gigante falar com você! Aqui é o Papai Noel... conversando ao vivo direto da minha oficina mágica no Polo Norte! Me disseram que você tem ${userAge} anos... e que tem sido uma criança absolutamente fantástica e muito boazinha este ano! Por isso... eu faço questão absoluta de te convidar pessoalmente para a nossa grande e inesquecível Festa de Natal do Acadêmicos da Vila! Venha celebrar com a gente, porque a sua presença vai iluminar a nossa festa! Um Feliz Natal... e um Ano Novo maravilhoso para você e toda a sua família! Ho... ho... ho! Feliz Natal!`;
+            return `Ho, ho, ho! Oi, ${userName}! Que alegria ver você por aqui! Sou eu... o Papai Noel! Estou falando direto da minha casa no Polo Norte. Sabia que eu vi que você tem ${userAge} anos... e que foi uma criança muito boazinha este ano? Por isso, eu quero muito te ver na nossa linda Festa de Natal do Acadêmicos da Vila! Venha brincar com a gente, o seu presente já está guardado! Um Feliz Natal bem feliz para você! Ho, ho, ho!`;
         }
 
-        // Seleção restrita para garantir voz 100% masculina e encorpada
+        // Seleção restrita para garantir voz 100% masculina e acolhedora
         function getBestSantaVoice() {
             const voices = speechSynth.getVoices();
             
-            // 1. Procura estritamente por perfis masculinos ou neurais em português
             let voice = voices.find(v => v.lang.includes('pt') && (
                 v.name.toLowerCase().includes('antonio') || 
                 v.name.toLowerCase().includes('ricardo') || 
@@ -299,7 +298,6 @@
                 v.name.toLowerCase().includes('natural')
             ));
 
-            // 2. Se não achar pelo nome, pega qualquer voz em português que NÃO contenha termos femininos
             if (!voice) {
                 voice = voices.find(v => v.lang.includes('pt') && 
                     !v.name.toLowerCase().includes('maria') && 
@@ -312,7 +310,6 @@
                 );
             }
 
-            // 3. Fallback final para português
             if (!voice) {
                 voice = voices.find(v => v.lang.includes('pt-BR') || v.lang.includes('pt'));
             }
@@ -379,9 +376,9 @@
                 currentUtterance.voice = santaVoice;
             }
             
-            // Ritmo pausado de conto de fadas e tom ultra-grave para garantir voz masculina de Papai Noel
+            // Ritmo carinhoso de avô e tom grave masculino
             currentUtterance.rate = 0.85; 
-            currentUtterance.pitch = 0.3; 
+            currentUtterance.pitch = 0.35; 
 
             const avatarContainer = document.getElementById('santa-avatar-container');
             const statusLabel = document.getElementById('player-status-label');
