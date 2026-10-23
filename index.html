@@ -130,7 +130,7 @@
             </div>
         </div>
 
-        <!-- SCREEN 3: VÍDEO / EXPERIÊNCIA INTERATIVA -->
+        <!-- SCREEN 3: VÍDEO / EXPERIÊNCIA INTERATIVA (SEM LEGENDA) -->
         <div id="screen-player" class="hidden space-y-6">
             <div class="flex items-center justify-between">
                 <div>
@@ -144,7 +144,7 @@
                 </button>
             </div>
 
-            <!-- Realistic Video Player Container (Sem Legendas) -->
+            <!-- Realistic Video Player Container -->
             <div class="relative w-full aspect-[4/3] bg-black rounded-2xl border-4 border-amber-400 shadow-2xl overflow-hidden flex flex-col items-center justify-between">
                 
                 <!-- Video Header Controls UI Simulation -->
@@ -213,7 +213,9 @@
     <script>
         let userName = "";
         let userAge = "";
-        let santaAudio = new Audio('papai-noel.mp3'); // Arquivo de áudio real do Papai Noel
+        let speechSynth = window.speechSynthesis;
+        let currentUtterance = null;
+        let audioCtx = null;
 
         // Generate Falling Snowflakes
         function initSnow() {
@@ -275,31 +277,112 @@
             }, 1000);
         }
 
+        // Dynamic Script with Name, Age and Natural Pauses
+        function getInvitationScript() {
+            return `Ho... ho... ho! Olá, ${userName}! Sou eu... o Papai Noel! Estou falando diretamente da minha poltrona mágica no Polo Norte. Fiquei sabendo que você tem ${userAge} anos... e que tem sido uma criança maravilhosa este ano! Por isso... faço questão absoluta de te convidar pessoalmente para a grande Festa de Natal do Acadêmicos da Vila! Venha celebrar com a gente, o seu lugar já está guardado no meu coração e no trenó! Um Feliz Natal... e um Ano Novo mágico! Ho, ho, ho!`;
+        }
+
+        function getBestSantaVoice() {
+            const voices = speechSynth.getVoices();
+            let voice = voices.find(v => v.lang.includes('pt') && (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('online') || v.name.toLowerCase().includes('neural')));
+            if (!voice) {
+                voice = voices.find(v => v.lang.includes('pt') && (v.name.toLowerCase().includes('antonio') || v.name.toLowerCase().includes('ricardo') || v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('felipe') || v.name.toLowerCase().includes('male')));
+            }
+            if (!voice) {
+                voice = voices.find(v => v.lang.includes('pt-BR') || v.lang.includes('pt'));
+            }
+            return voice || null;
+        }
+
+        // Cozy fireplace ambiance
+        function playMagicalAmbiance() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const bufferSize = audioCtx.sampleRate * 2;
+                const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 2 - 1;
+                }
+
+                const whiteNoise = audioCtx.createBufferSource();
+                whiteNoise.buffer = noiseBuffer;
+                whiteNoise.loop = true;
+
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(250, audioCtx.currentTime);
+
+                const gainNode = audioCtx.createGain();
+                gainNode.gain.setValueAtTime(0.008, audioCtx.currentTime);
+
+                whiteNoise.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                whiteNoise.start();
+
+                setTimeout(() => {
+                    try { whiteNoise.stop(); } catch(e) {}
+                }, 30000);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
         function playSantaVoice() {
+            if (!speechSynth) {
+                showModal("Aviso", "Seu navegador não suporta a Síntese de Voz, mas o convite está garantido!");
+                return;
+            }
+
+            speechSynth.cancel();
+            playMagicalAmbiance();
+
+            const textToSpeak = getInvitationScript();
+            currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
+            currentUtterance.lang = 'pt-BR';
+            
+            const santaVoice = getBestSantaVoice();
+            if (santaVoice) {
+                currentUtterance.voice = santaVoice;
+            }
+            
+            currentUtterance.rate = 0.82; 
+            currentUtterance.pitch = 0.45; 
+
             const avatarContainer = document.getElementById('santa-avatar-container');
             const statusLabel = document.getElementById('player-status-label');
             const playDot = document.getElementById('play-dot');
 
-            // Para qualquer reprodução anterior
-            santaAudio.pause();
-            santaAudio.currentTime = 0;
-
-            santaAudio.play().then(() => {
+            currentUtterance.onstart = function() {
                 avatarContainer.classList.add('santa-talking');
                 playDot.classList.remove('bg-red-500');
                 playDot.classList.add('bg-green-500');
                 statusLabel.textContent = "AO VIVO • CHAMADA SEGURA 🔴";
-            }).catch(error => {
-                console.log("Erro ao reproduzir áudio:", error);
-                showModal("Aviso", "Toque em 'Ouvir de Novo' para iniciar a mensagem do Papai Noel!");
-            });
+            };
 
-            santaAudio.onended = function() {
+            currentUtterance.onend = function() {
                 avatarContainer.classList.remove('santa-talking');
                 playDot.classList.remove('bg-green-500');
                 playDot.classList.add('bg-red-500');
                 statusLabel.textContent = "MENSAGEM CONCLUÍDA 🌟";
             };
+
+            currentUtterance.onerror = function() {
+                avatarContainer.classList.remove('santa-talking');
+            };
+
+            speechSynth.speak(currentUtterance);
+        }
+
+        if (speechSynth.onvoiceschanged !== undefined) {
+            speechSynth.onvoiceschanged = getBestSantaVoice;
         }
 
         // Confirm Attendance
@@ -341,8 +424,7 @@
 
         // Reset App to Form Screen
         function resetApp() {
-            santaAudio.pause();
-            santaAudio.currentTime = 0;
+            if (speechSynth) speechSynth.cancel();
             document.getElementById('screen-player').classList.add('hidden');
             document.getElementById('screen-form').classList.remove('hidden');
             document.getElementById('user-name').value = "";
