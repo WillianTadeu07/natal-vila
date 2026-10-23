@@ -45,10 +45,10 @@
         /* Santa speaking animation */
         @keyframes talk {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+            50% { transform: scale(1.03); }
         }
         .santa-talking {
-            animation: talk 0.8s ease-in-out infinite;
+            animation: talk 0.7s ease-in-out infinite;
         }
         
         /* Custom Scrollbar */
@@ -277,9 +277,9 @@
             }, 1000);
         }
 
-        // Dynamic Script with Name, Age and Natural Pauses
+        // Script reformulado com muita emoção, exclamações e alegria contagiante
         function getInvitationScript() {
-            return `Ho... ho... ho! Olá, ${userName}! Sou eu... o Papai Noel! Estou falando diretamente da minha poltrona mágica no Polo Norte. Fiquei sabendo que você tem ${userAge} anos... e que tem sido uma criança maravilhosa este ano! Por isso... faço questão absoluta de te convidar pessoalmente para a grande Festa de Natal do Acadêmicos da Vila! Venha celebrar com a gente, o seu lugar já está guardado no meu coração e no trenó! Um Feliz Natal... e um Ano Novo mágico! Ho, ho, ho!`;
+            return `Ho, ho, ho! Olá, ${userName}! Que alegria imensa falar com você! Aqui é o Papai Noel, conversando ao vivo da minha oficina mágica no Polo Norte! Me disseram que você tem ${userAge} anos... e que tem sido uma criança absolutamente fantástica e cheia de bondade este ano! Por isso, eu faço questão absoluta de te convidar para a nossa grande e inesquecível Festa de Natal do Acadêmicos da Vila! Venha celebrar com a gente, sua presença vai iluminar a nossa festa! Um Feliz Natal e um Ano Novo maravilhoso para você e toda a sua família! Ho, ho, ho! Feliz Natal!`;
         }
 
         function getBestSantaVoice() {
@@ -294,7 +294,7 @@
             return voice || null;
         }
 
-        // Cozy fireplace ambiance
+        // Cozy fireplace ambiance with magical bell chimes effect
         function playMagicalAmbiance() {
             try {
                 if (!audioCtx) {
@@ -317,10 +317,10 @@
 
                 const filter = audioCtx.createBiquadFilter();
                 filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(250, audioCtx.currentTime);
+                filter.frequency.setValueAtTime(300, audioCtx.currentTime);
 
                 const gainNode = audioCtx.createGain();
-                gainNode.gain.setValueAtTime(0.008, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.012, audioCtx.currentTime);
 
                 whiteNoise.connect(filter);
                 filter.connect(gainNode);
@@ -329,7 +329,7 @@
 
                 setTimeout(() => {
                     try { whiteNoise.stop(); } catch(e) {}
-                }, 30000);
+                }, 35000);
             } catch (e) {
                 console.log(e);
             }
@@ -353,8 +353,9 @@
                 currentUtterance.voice = santaVoice;
             }
             
-            currentUtterance.rate = 0.82; 
-            currentUtterance.pitch = 0.45; 
+            // Velocidade e tom ajustados para garantir um tom alegre, enérgico e caloroso
+            currentUtterance.rate = 0.92; 
+            currentUtterance.pitch = 0.65; 
 
             const avatarContainer = document.getElementById('santa-avatar-container');
             const statusLabel = document.getElementById('player-status-label');
@@ -364,7 +365,7 @@
                 avatarContainer.classList.add('santa-talking');
                 playDot.classList.remove('bg-red-500');
                 playDot.classList.add('bg-green-500');
-                statusLabel.textContent = "AO VIVO • CHAMADA SEGURA 🔴";
+                statusLabel.textContent = "AO VIVO • CHAMADA MÁGICA 🔴";
             };
 
             currentUtterance.onend = function() {
