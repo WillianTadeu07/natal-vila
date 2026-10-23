@@ -277,24 +277,50 @@
             }, 1000);
         }
 
-        // Script reformulado com muita emoção, exclamações e alegria contagiante
+        // Script com pausas orgânicas e entonação calorosa de avô
         function getInvitationScript() {
-            return `Ho, ho, ho! Olá, ${userName}! Que alegria imensa falar com você! Aqui é o Papai Noel, conversando ao vivo da minha oficina mágica no Polo Norte! Me disseram que você tem ${userAge} anos... e que tem sido uma criança absolutamente fantástica e cheia de bondade este ano! Por isso, eu faço questão absoluta de te convidar para a nossa grande e inesquecível Festa de Natal do Acadêmicos da Vila! Venha celebrar com a gente, sua presença vai iluminar a nossa festa! Um Feliz Natal e um Ano Novo maravilhoso para você e toda a sua família! Ho, ho, ho! Feliz Natal!`;
+            return `Ho... ho... ho! Olá, ${userName}! Que alegria gigante falar com você! Aqui é o Papai Noel... conversando ao vivo direto da minha oficina mágica no Polo Norte! Me disseram que você tem ${userAge} anos... e que tem sido uma criança absolutamente fantástica e muito boazinha este ano! Por isso... eu faço questão absoluta de te convidar pessoalmente para a nossa grande e inesquecível Festa de Natal do Acadêmicos da Vila! Venha celebrar com a gente, porque a sua presença vai iluminar a nossa festa! Um Feliz Natal... e um Ano Novo maravilhoso para você e toda a sua família! Ho... ho... ho! Feliz Natal!`;
         }
 
+        // Seleção restrita para garantir voz 100% masculina e encorpada
         function getBestSantaVoice() {
             const voices = speechSynth.getVoices();
-            let voice = voices.find(v => v.lang.includes('pt') && (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('online') || v.name.toLowerCase().includes('neural')));
+            
+            // 1. Procura estritamente por perfis masculinos ou neurais em português
+            let voice = voices.find(v => v.lang.includes('pt') && (
+                v.name.toLowerCase().includes('antonio') || 
+                v.name.toLowerCase().includes('ricardo') || 
+                v.name.toLowerCase().includes('daniel') || 
+                v.name.toLowerCase().includes('felipe') || 
+                v.name.toLowerCase().includes('luciano') ||
+                v.name.toLowerCase().includes('manoel') ||
+                v.name.toLowerCase().includes('male') ||
+                v.name.toLowerCase().includes('homem') ||
+                v.name.toLowerCase().includes('natural')
+            ));
+
+            // 2. Se não achar pelo nome, pega qualquer voz em português que NÃO contenha termos femininos
             if (!voice) {
-                voice = voices.find(v => v.lang.includes('pt') && (v.name.toLowerCase().includes('antonio') || v.name.toLowerCase().includes('ricardo') || v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('felipe') || v.name.toLowerCase().includes('male')));
+                voice = voices.find(v => v.lang.includes('pt') && 
+                    !v.name.toLowerCase().includes('maria') && 
+                    !v.name.toLowerCase().includes('lucia') && 
+                    !v.name.toLowerCase().includes('helena') && 
+                    !v.name.toLowerCase().includes('francisca') && 
+                    !v.name.toLowerCase().includes('female') &&
+                    !v.name.toLowerCase().includes('mulher') &&
+                    !v.name.toLowerCase().includes('zira')
+                );
             }
+
+            // 3. Fallback final para português
             if (!voice) {
                 voice = voices.find(v => v.lang.includes('pt-BR') || v.lang.includes('pt'));
             }
+
             return voice || null;
         }
 
-        // Cozy fireplace ambiance with magical bell chimes effect
+        // Cozy fireplace ambiance
         function playMagicalAmbiance() {
             try {
                 if (!audioCtx) {
@@ -353,9 +379,9 @@
                 currentUtterance.voice = santaVoice;
             }
             
-            // Velocidade e tom ajustados para garantir um tom alegre, enérgico e caloroso
-            currentUtterance.rate = 0.92; 
-            currentUtterance.pitch = 0.65; 
+            // Ritmo pausado de conto de fadas e tom ultra-grave para garantir voz masculina de Papai Noel
+            currentUtterance.rate = 0.85; 
+            currentUtterance.pitch = 0.3; 
 
             const avatarContainer = document.getElementById('santa-avatar-container');
             const statusLabel = document.getElementById('player-status-label');
