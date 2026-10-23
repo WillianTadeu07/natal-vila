@@ -154,7 +154,7 @@
                         <div id="play-dot" class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
                         <span id="player-status-label" class="text-xs font-semibold text-amber-200 uppercase tracking-wider">Papai Noel Falando</span>
                     </div>
-                    <span class="text-xs text-gray-300 font-mono">00:20 / 00:35</span>
+                    <span class="text-xs text-gray-300 font-mono">00:22 / 00:35</span>
                 </div>
 
                 <!-- Santa Avatar / Illustration Area -->
@@ -287,32 +287,23 @@
             }, 1000);
         }
 
-        // Script generation with rich pauses and magical tone
+        // Script with natural pauses using ellipses and commas for better cadence
         function getInvitationScript() {
-            return `Ho, ho, ho! Olá, ${userName}! Sou eu, o Papai Noel, falando diretamente da minha oficina mágica no Polo Norte! Fiquei sabendo que você tem ${userAge} anos... e que se comportou muito bem este ano! Por isso, faço questão de te convidar pessoalmente para a grande Festa de Natal do Acadêmicos da Vila! Venha celebrar com a gente, vai ser inesquecível! Um Feliz Natal e um Ano Novo maravilhoso! Ho, ho, ho!`;
+            return `Ho... ho... ho! Olá, ${userName}! Sou eu... o Papai Noel! Estou falando diretamente da minha oficina mágica no Polo Norte. Fiquei sabendo que você tem ${userAge} anos... e que se comportou muito bem este ano! Por isso... faço questão de te convidar pessoalmente para a grande Festa de Natal do Acadêmicos da Vila! Venha celebrar com a gente, vai ser inesquecível! Um Feliz Natal... e um Ano Novo maravilhoso! Ho, ho, ho!`;
         }
 
-        // Advanced Voice Selection targeting High Quality Neural/Online/Natural Voices
         function getBestSantaVoice() {
             const voices = speechSynth.getVoices();
-            
-            // 1. Try to find Microsoft or Google Neural/Natural Portuguese voice first (best quality)
             let voice = voices.find(v => v.lang.includes('pt') && (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('online') || v.name.toLowerCase().includes('neural')));
-            
-            // 2. If not found, try specific male Portuguese voices
             if (!voice) {
                 voice = voices.find(v => v.lang.includes('pt') && (v.name.toLowerCase().includes('antonio') || v.name.toLowerCase().includes('ricardo') || v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('felipe') || v.name.toLowerCase().includes('male')));
             }
-            
-            // 3. Fallback to any Portuguese voice
             if (!voice) {
                 voice = voices.find(v => v.lang.includes('pt-BR') || v.lang.includes('pt'));
             }
-            
             return voice || null;
         }
 
-        // Play subtle magical Christmas ambiance (fire crackle & chimes)
         function playMagicalAmbiance() {
             try {
                 if (!audioCtx) {
@@ -322,7 +313,6 @@
                     audioCtx.resume();
                 }
 
-                // Create a gentle fireplace/wind warm noise
                 const bufferSize = audioCtx.sampleRate * 2;
                 const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const output = noiseBuffer.getChannelData(0);
@@ -334,25 +324,23 @@
                 whiteNoise.buffer = noiseBuffer;
                 whiteNoise.loop = true;
 
-                // Low pass filter to make it cozy and warm like a distant fireplace
                 const filter = audioCtx.createBiquadFilter();
                 filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(350, audioCtx.currentTime);
+                filter.frequency.setValueAtTime(300, audioCtx.currentTime);
 
                 const gainNode = audioCtx.createGain();
-                gainNode.gain.setValueAtTime(0.015, audioCtx.currentTime); // Very soft background ambiance
+                gainNode.gain.setValueAtTime(0.01, audioCtx.currentTime);
 
                 whiteNoise.connect(filter);
                 filter.connect(gainNode);
                 gainNode.connect(audioCtx.destination);
                 whiteNoise.start();
 
-                // Stop ambiance after 20 seconds
                 setTimeout(() => {
                     try { whiteNoise.stop(); } catch(e) {}
-                }, 22000);
+                }, 25000);
             } catch (e) {
-                console.log("Audio Context info:", e);
+                console.log(e);
             }
         }
 
@@ -374,9 +362,8 @@
                 currentUtterance.voice = santaVoice;
             }
             
-            // Optimized parameters for a warm, cozy storytelling cadence
-            currentUtterance.rate = 0.9;  // Calm, storytelling pace
-            currentUtterance.pitch = 0.55; // Warm, deep masculine tone without sounding cartoonish
+            currentUtterance.rate = 0.82; // Slower, storytelling rhythm
+            currentUtterance.pitch = 0.5;  // Deep, warm voice
 
             const avatarContainer = document.getElementById('santa-avatar-container');
             const subtitleEl = document.getElementById('karaoke-subtitle');
@@ -384,8 +371,8 @@
             const playDot = document.getElementById('play-dot');
 
             const chunks = [
-                `🎅 Ho, ho, ho! Olá, ${userName}!`,
-                `🎁 Sou eu, o Papai Noel, na minha oficina mágica no Polo Norte!`,
+                `🎅 Ho... ho... ho! Olá, ${userName}!`,
+                `🎁 Sou eu... o Papai Noel, direto da oficina no Polo Norte!`,
                 `⭐ Fiquei sabendo que você tem ${userAge} anos e se comportou muito bem!`,
                 `✨ Venha para a grande Festa de Natal do Acadêmicos da Vila!`,
                 `🎄 Um Feliz Natal e um Ano Novo maravilhoso! Ho, ho, ho!`
@@ -410,7 +397,7 @@
                     } else {
                         clearInterval(chunkInterval);
                     }
-                }, 3500);
+                }, 4000);
             };
 
             currentUtterance.onend = function() {
