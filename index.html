@@ -29,12 +29,8 @@
             z-index: 50;
         }
         @keyframes fall {
-            0% {
-                transform: translateY(-10px) translateX(0);
-            }
-            100% {
-                transform: translateY(105vh) translateX(20px);
-            }
+            0% { transform: translateY(-10px) translateX(0); }
+            100% { transform: translateY(105vh) translateX(20px); }
         }
         /* Blinking fairy lights */
         @keyframes blink {
@@ -94,7 +90,7 @@
                     Convite Mágico do Papai Noel
                 </h1>
                 <p class="text-gray-300 text-sm">
-                    Preencha seus dados para receber um convite em vídeo personalizado direto do Polo Norte! 🎅✨
+                    Preencha seu nome e idade para receber um convite em vídeo personalizado direto do Polo Norte! 🎅✨
                 </p>
             </div>
 
@@ -106,8 +102,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-amber-200 mb-1">Apelido ou Como Gosta de ser Chamado (Opcional)</label>
-                    <input type="text" id="user-nickname" placeholder="Ex: Mari" 
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-amber-200 mb-1">Sua Idade *</label>
+                    <input type="number" id="user-age" required min="1" max="120" placeholder="Ex: 25" 
                         class="w-full px-4 py-3 bg-slate-800/90 border border-amber-500/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 text-white placeholder-gray-500 font-medium">
                 </div>
 
@@ -121,7 +117,6 @@
         <!-- SCREEN 2: LOADING MÁGICO -->
         <div id="screen-loading" class="hidden py-12 text-center space-y-6">
             <div class="relative w-28 h-28 mx-auto flex items-center justify-center">
-                <!-- Glowing rotating ring -->
                 <div class="absolute inset-0 border-4 border-amber-400/30 border-t-amber-400 rounded-full animate-spin"></div>
                 <span class="text-5xl animate-bounce">🎁</span>
             </div>
@@ -165,15 +160,13 @@
                 <!-- Santa Avatar / Illustration Area -->
                 <div class="my-auto relative flex flex-col items-center justify-center">
                     <div id="santa-avatar-container" class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-gradient-to-b from-red-600 to-red-800 border-4 border-amber-400 shadow-xl flex items-center justify-center relative transition-transform">
-                        <!-- Santa Face SVG / Emoji -->
                         <div class="text-7xl select-none filter drop-shadow-md">🎅</div>
-                        <!-- Sparkles -->
                         <div class="absolute -top-1 -right-1 text-amber-300 animate-ping">✨</div>
                         <div class="absolute -bottom-1 -left-1 text-amber-300 animate-pulse">⭐</div>
                     </div>
                     <div class="mt-3 text-center">
                         <span class="text-xs font-bold bg-amber-400 text-slate-950 px-3 py-0.5 rounded-full uppercase tracking-wider shadow">
-                            Ao Vivo do Polo Norte
+                            Fábrica do Polo Norte &bull; Ao Vivo
                         </span>
                     </div>
                 </div>
@@ -209,7 +202,7 @@
 
     </main>
 
-    <!-- Custom Modal for Alerts/Confirmations (No window.alert) -->
+    <!-- Custom Modal for Alerts/Confirmations -->
     <div id="custom-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-gradient-to-b from-red-950 to-slate-900 border-2 border-amber-400 rounded-2xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl relative">
             <div id="modal-icon" class="text-5xl">🎄</div>
@@ -228,9 +221,8 @@
 
     <!-- JavaScript Application Logic -->
     <script>
-        // Global State Variables
         let userName = "";
-        let userNickname = "";
+        let userAge = "";
         let speechSynth = window.speechSynthesis;
         let currentUtterance = null;
 
@@ -256,11 +248,10 @@
         document.getElementById('invite-form').addEventListener('submit', function(e) {
             e.preventDefault();
             userName = document.getElementById('user-name').value.trim();
-            userNickname = document.getElementById('user-nickname').value.trim() || userName;
+            userAge = document.getElementById('user-age').value.trim();
 
-            if (!userName) return;
+            if (!userName || !userAge) return;
 
-            // Switch to Loading Screen
             document.getElementById('screen-form').classList.add('hidden');
             document.getElementById('screen-loading').classList.remove('hidden');
 
@@ -274,7 +265,7 @@
             
             const steps = [
                 { text: "Verificando a lista de comportamentos...", progress: "30%" },
-                { text: "Consultando os elfos da oficina...", progress: "65%" },
+                { text: "Consultando os elfos na oficina do Polo Norte...", progress: "65%" },
                 { text: "Preparando o trenó e o convite especial...", progress: "100%" }
             ];
 
@@ -295,10 +286,21 @@
             }, 1000);
         }
 
-        // Speech and Karaoke Simulation
+        // Script generation
         function getInvitationScript() {
-            const callName = userNickname || userName;
-            return `Ho, ho, ho! Olá ${callName}! Aqui é o Papai Noel! Estou passando para te fazer um convite imperdível: venha curtir a grande Festa de Natal do Acadêmicos da Vila! Não vejo a hora de te ver lá com a gente! Um Feliz Natal e um Ano Novo maravilhoso! Ho, ho, ho!`;
+            return `Ho, ho, ho! Olá ${userName}! Sou eu, o Papai Noel, falando diretamente da minha fábrica no Polo Norte! Fiquei sabendo que você tem ${userAge} anos de pura alegria e bom comportamento. Por isso, faço questão de te convidar pessoalmente para a grande Festa de Natal do Acadêmicos da Vila! Venha celebrar com a gente! Um Feliz Natal e um Ano Novo maravilhoso! Ho, ho, ho!`;
+        }
+
+        // Helper to find the best male Portuguese voice
+        function getBestSantaVoice() {
+            const voices = speechSynth.getVoices();
+            // Try to find a Portuguese voice with male descriptors or names
+            let ptVoice = voices.find(v => v.lang.includes('pt') && (v.name.toLowerCase().includes('antonio') || v.name.toLowerCase().includes('ricardo') || v.name.toLowerCase().includes('felipe') || v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('male')));
+            if (!ptVoice) {
+                // Fallback to any Portuguese voice
+                ptVoice = voices.find(v => v.lang.includes('pt-BR') || v.lang.includes('pt'));
+            }
+            return ptVoice || null;
         }
 
         function playSantaVoice() {
@@ -307,28 +309,31 @@
                 return;
             }
 
-            // Cancel any ongoing speech
             speechSynth.cancel();
 
             const textToSpeak = getInvitationScript();
             currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
             currentUtterance.lang = 'pt-BR';
-            currentUtterance.rate = 0.95; // Jolly pace
-            currentUtterance.pitch = 0.9;  // Deep Santa voice
+            
+            // Voice adjustment for a deep, realistic Santa voice
+            const santaVoice = getBestSantaVoice();
+            if (santaVoice) {
+                currentUtterance.voice = santaVoice;
+            }
+            currentUtterance.rate = 0.85;  // Slow, jolly and resonant pace
+            currentUtterance.pitch = 0.4;  // Deep, booming masculine Santa voice
 
             const avatarContainer = document.getElementById('santa-avatar-container');
             const subtitleEl = document.getElementById('karaoke-subtitle');
             const statusLabel = document.getElementById('player-status-label');
             const playDot = document.getElementById('play-dot');
 
-            // Split into sentence chunks for karaoke display
-            const callName = userNickname || userName;
             const chunks = [
-                "🎅 Ho, ho, ho! Olá " + callName + "!",
-                "🎁 Aqui é o Papai Noel!",
-                "⭐ Venha curtir a grande Festa de Natal do Acadêmicos da Vila!",
-                "✨ Não vejo a hora de te ver lá com a gente!",
-                "🎄 Um Feliz Natal e um Ano Novo maravilhoso! Ho, ho, ho!"
+                `🎅 Ho, ho, ho! Olá ${userName}!`,
+                `🎁 Aqui é o Papai Noel, direto da minha fábrica no Polo Norte!`,
+                `⭐ Fiquei sabendo que você tem ${userAge} anos. Venha para a Festa de Natal do Acadêmicos da Vila!`,
+                `✨ Não vejo a hora de te ver lá com a gente!`,
+                `🎄 Um Feliz Natal e um Ano Novo maravilhoso! Ho, ho, ho!`
             ];
 
             let chunkIndex = 0;
@@ -350,7 +355,7 @@
                     } else {
                         clearInterval(chunkInterval);
                     }
-                }, 2800);
+                }, 3200);
             };
 
             currentUtterance.onend = function() {
@@ -370,12 +375,16 @@
             speechSynth.speak(currentUtterance);
         }
 
+        // Trigger voice loading list initialization in some browsers
+        if (speechSynth.onvoiceschanged !== undefined) {
+            speechSynth.onvoiceschanged = getBestSantaVoice;
+        }
+
         // Confirm Attendance
         function confirmAttendance() {
-            const callName = userNickname || userName;
             showModal(
                 "Presença Confirmada! 🎉",
-                `Oba, ${callName}! Sua presença na Festa de Natal do Acadêmicos da Vila foi confirmada com sucesso! O Papai Noel já separou um lugar especial para você no trenó!`
+                `Oba, ${userName}! Sua presença na Festa de Natal do Acadêmicos da Vila foi confirmada com sucesso! O Papai Noel já separou um lugar especial para você no trenó!`
             );
         }
 
@@ -414,10 +423,10 @@
             document.getElementById('screen-player').classList.add('hidden');
             document.getElementById('screen-form').classList.remove('hidden');
             document.getElementById('user-name').value = "";
-            document.getElementById('user-nickname').value = "";
+            document.getElementById('user-age').value = "";
         }
 
-        // Modal Helpers (No alert/confirm)
+        // Modal Helpers
         function showModal(title, message) {
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-message').textContent = message;
