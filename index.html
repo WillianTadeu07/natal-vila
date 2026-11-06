@@ -45,10 +45,10 @@
         /* Santa speaking animation */
         @keyframes talk {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); }
+            50% { transform: scale(1.04); filter: brightness(1.05); }
         }
         .santa-talking {
-            animation: talk 0.7s ease-in-out infinite;
+            animation: talk 0.6s ease-in-out infinite;
         }
         
         /* Custom Scrollbar */
@@ -130,7 +130,7 @@
             </div>
         </div>
 
-        <!-- SCREEN 3: VÍDEO / EXPERIÊNCIA INTERATIVA (SEM LEGENDA) -->
+        <!-- SCREEN 3: VÍDEO / EXPERIÊNCIA INTERATIVA -->
         <div id="screen-player" class="hidden space-y-6">
             <div class="flex items-center justify-between">
                 <div>
@@ -217,6 +217,16 @@
         let currentUtterance = null;
         let audioCtx = null;
 
+        // Desbloquear áudio nativo no primeiro toque do usuário (fundamental para mobile)
+        document.addEventListener('click', () => {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }, { once: true });
+
         // Generate Falling Snowflakes
         function initSnow() {
             const container = document.getElementById('snow-container');
@@ -277,15 +287,17 @@
             }, 1000);
         }
 
-        // Frase bem simples, emocionante e mágica, perfeita para crianças entenderem e se encantarem
+        // Roteiro mágico, simples e emocionante
         function getInvitationScript() {
-            return `Ho, ho, ho! Oi, ${userName}! Que alegria ver você por aqui! Sou eu... o Papai Noel! Estou falando direto da minha casa no Polo Norte. Sabia que eu vi que você tem ${userAge} anos... e que foi uma criança muito boazinha este ano? Por isso, eu quero muito te ver na nossa linda Festa de Natal do Acadêmicos da Vila! Venha brincar com a gente, o seu presente já está guardado! Vem pra Vila ! Um Feliz Natal! Ho, ho, ho!`;
+            return `Ho, ho, ho! Oi, ${userName}! Que alegria ver você por aqui! Sou eu... o Papai Noel! Estou falando direto da minha casa no Polo Norte. Sabia que eu vi que você tem ${userAge} anos... e que foi uma criança muito boazinha este ano? Por isso, eu quero muito te ver na nossa linda Festa de Natal do Acadêmicos da Vila! Venha brincar com a gente, o seu presente já está guardado! Vem pra Vila! Um Feliz Natal! Ho, ho, ho!`;
         }
 
-        // Seleção restrita para garantir voz 100% masculina e acolhedora
+        // Seleção Ultra-Rigorosa para evitar voz feminina e garantir tom encorpado
         function getBestSantaVoice() {
+            if (!speechSynth) return null;
             const voices = speechSynth.getVoices();
             
+            // 1. Tenta encontrar vozes masculinas conhecidas em português (Brasil ou Portugal)
             let voice = voices.find(v => v.lang.includes('pt') && (
                 v.name.toLowerCase().includes('antonio') || 
                 v.name.toLowerCase().includes('ricardo') || 
@@ -293,28 +305,26 @@
                 v.name.toLowerCase().includes('felipe') || 
                 v.name.toLowerCase().includes('luciano') ||
                 v.name.toLowerCase().includes('manoel') ||
-                v.name.toLowerCase().includes('male') ||
-                v.name.toLowerCase().includes('homem') ||
-                v.name.toLowerCase().includes('natural')
+                v.name.toLowerCase().includes('brazil') ||
+                v.name.toLowerCase().includes('google português do brasil') ||
+                v.name.toLowerCase().includes('microsoft daniel')
             ));
 
+            // 2. Se não achar específica, filtra qualquer uma que NÃO tenha nomes femininos clássicos
             if (!voice) {
                 voice = voices.find(v => v.lang.includes('pt') && 
                     !v.name.toLowerCase().includes('maria') && 
                     !v.name.toLowerCase().includes('lucia') && 
                     !v.name.toLowerCase().includes('helena') && 
                     !v.name.toLowerCase().includes('francisca') && 
+                    !v.name.toLowerCase().includes('zira') &&
+                    !v.name.toLowerCase().includes('vitoria') &&
                     !v.name.toLowerCase().includes('female') &&
-                    !v.name.toLowerCase().includes('mulher') &&
-                    !v.name.toLowerCase().includes('zira')
+                    !v.name.toLowerCase().includes('mulher')
                 );
             }
 
-            if (!voice) {
-                voice = voices.find(v => v.lang.includes('pt-BR') || v.lang.includes('pt'));
-            }
-
-            return voice || null;
+            return voice || voices.find(v => v.lang.includes('pt')) || null;
         }
 
         // Cozy fireplace ambiance
@@ -340,10 +350,10 @@
 
                 const filter = audioCtx.createBiquadFilter();
                 filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(300, audioCtx.currentTime);
+                filter.frequency.setValueAtTime(250, audioCtx.currentTime);
 
                 const gainNode = audioCtx.createGain();
-                gainNode.gain.setValueAtTime(0.012, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.008, audioCtx.currentTime);
 
                 whiteNoise.connect(filter);
                 filter.connect(gainNode);
@@ -352,7 +362,7 @@
 
                 setTimeout(() => {
                     try { whiteNoise.stop(); } catch(e) {}
-                }, 35000);
+                }, 30000);
             } catch (e) {
                 console.log(e);
             }
@@ -376,9 +386,9 @@
                 currentUtterance.voice = santaVoice;
             }
             
-            // Ritmo carinhoso de avô e tom grave masculino
-            currentUtterance.rate = 0.85; 
-            currentUtterance.pitch = 0.35; 
+            // Ajustes refinados para engrossar o tom e dar ritmo acolhedor de Papai Noel
+            currentUtterance.rate = 0.82; // Um pouco mais cadenciado para emocionar
+            currentUtterance.pitch = 0.3;  // Tom bem grave simulando a barba e idade do Papai Noel
 
             const avatarContainer = document.getElementById('santa-avatar-container');
             const statusLabel = document.getElementById('player-status-label');
@@ -402,11 +412,16 @@
                 avatarContainer.classList.remove('santa-talking');
             };
 
-            speechSynth.speak(currentUtterance);
-        }
-
-        if (speechSynth.onvoiceschanged !== undefined) {
-            speechSynth.onvoiceschanged = getBestSantaVoice;
+            // Garante carregamento correto das vozes no iOS/Safari
+            if (speechSynth.getVoices().length === 0) {
+                speechSynth.onvoiceschanged = () => {
+                    const v = getBestSantaVoice();
+                    if (v) currentUtterance.voice = v;
+                    speechSynth.speak(currentUtterance);
+                };
+            } else {
+                speechSynth.speak(currentUtterance);
+            }
         }
 
         // Confirm Attendance
